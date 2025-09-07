@@ -1,49 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Birthday Card</title>
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body onload="startConfetti()">
-    <div class="card">
-      <div class="outside">
-        <div class="front">
-          <p>Happy Birthday Madam</p>
-          <div class="cake">
-            <div class="top-layer"></div>
-            <div class="middle-layer"></div>
-            <div class="bottom-layer"></div>
-            <div class="candle"></div>
-          </div>
-        </div>
-        <div class="back"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Birthday Card</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  
+  <div class="card-container">
+    <div class="card" id="birthdayCard">
+      <div class="card-front">
+        <h1>🎉 Happy Birthday 🎂</h1>
+        <p>Tap to flip!</p>
       </div>
-      <div class="inside">
-        <p>
-          Happy birthday bandariyaa🐒 <br />
-          You will always be bandariya but a good one..😂🐒 <br />
-          Have fun n take care <br />
-          **ab mujhe kaam krna hai**
-        </p>
-        <h1>&#127873;</h1>
+      <div class="card-back">
+        <h2>Wishing you joy & smiles 🎈</h2>
+        <div class="cake">🍰</div>
       </div>
     </div>
+  </div>
 
-    <script src="confetti.js"></script>
-    <script>
-      const card = document.querySelector(".card");
-      card.addEventListener("click", () => {
-        card.classList.toggle("flipped");
-        startConfetti();
-        setTimeout(stopConfetti, 3000);
-      });
-    </script>
-  </body>
+  <script src="confetti.js"></script>
+  <script>
+    const card = document.getElementById("birthdayCard");
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+  </script>
+</body>
 </html>
