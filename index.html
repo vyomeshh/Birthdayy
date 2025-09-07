@@ -9,8 +9,6 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
-
-   
     <link rel="stylesheet" href="style.css" />
   </head>
   <body onload="startConfetti()">
@@ -28,17 +26,24 @@
         <div class="back"></div>
       </div>
       <div class="inside">
-        <p>Happy birthday bandariyaa🐒
-You will always be bandariya but a good one..😂🐒
-Have fun Be Safe n take care 
-**ab mujhe kaam krna hai**</p>
+        <p>
+          Happy birthday bandariyaa🐒 <br />
+          You will always be bandariya but a good one..😂🐒 <br />
+          Have fun n take care <br />
+          **ab mujhe kaam krna hai**
+        </p>
         <h1>&#127873;</h1>
       </div>
     </div>
+
+    <script src="confetti.js"></script>
+    <script>
+      const card = document.querySelector(".card");
+      card.addEventListener("click", () => {
+        card.classList.toggle("flipped");
+        startConfetti();
+        setTimeout(stopConfetti, 3000);
+      });
+    </script>
   </body>
-  <script src="confetti.js"></script>
-
-  <script>
-</script>
 </html>
-
