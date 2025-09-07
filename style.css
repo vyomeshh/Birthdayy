@@ -20,10 +20,11 @@ body {
   perspective: 1200px;
   transition: 1s;
 }
-.card:hover {
+.card.touch-hover {
   transform: rotate(-5deg);
 }
-.card:hover .outside {
+
+.card.touch-hover .outside {
   transform: rotateY(-130deg);
 }
 .outside,
@@ -139,3 +140,4 @@ body {
   font-size: 120px;
   line-height: 120px;
 }
+
