@@ -1,130 +1,124 @@
-var maxParticleCount = 150; //set max confetti count
-var particleSpeed = 2; //set the particle animation speed
-var startConfetti; //call to start confetti animation
-var stopConfetti; //call to stop adding confetti
-var toggleConfetti; //call to start or stop the confetti animation depending on whether it's already running
-var removeConfetti; //call to stop the confetti animation and remove all confetti immediately
+import React, { useEffect, useRef } from 'react';
 
-(function() {
-	startConfetti = startConfettiInner;
-	stopConfetti = stopConfettiInner;
-	toggleConfetti = toggleConfettiInner;
-	removeConfetti = removeConfettiInner;
-	var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"]
-	var streamingConfetti = false;
-	var animationTimer = null;
-	var particles = [];
-	var waveAngle = 0;
-	
-	function resetParticle(particle, width, height) {
-		particle.color = colors[(Math.random() * colors.length) | 0];
-		particle.x = Math.random() * width;
-		particle.y = Math.random() * height - height;
-		particle.diameter = Math.random() * 10 + 5;
-		particle.tilt = Math.random() * 10 - 10;
-		particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
-		particle.tiltAngle = 0;
-		return particle;
-	}
+const maxParticleCount = 150;
+const particleSpeed = 2;
+const colors = [
+  "DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue",
+  "LightBlue", "Violet", "PaleGreen", "SteelBlue",
+  "SandyBrown", "Chocolate", "Crimson"
+];
 
-	function startConfettiInner() {
-		var width = window.innerWidth;
-		var height = window.innerHeight;
-		window.requestAnimFrame = (function() {
-			return window.requestAnimationFrame ||
-				window.webkitRequestAnimationFrame ||
-				window.mozRequestAnimationFrame ||
-				window.oRequestAnimationFrame ||
-				window.msRequestAnimationFrame ||
-				function (callback) {
-					return window.setTimeout(callback, 16.6666667);
-				};
-		})();
-		var canvas = document.getElementById("confetti-canvas");
-		if (canvas === null) {
-			canvas = document.createElement("canvas");
-			canvas.setAttribute("id", "confetti-canvas");
-			canvas.setAttribute("style", "display:block;z-index:999999;pointer-events:none");
-			document.body.appendChild(canvas);
-			canvas.width = width;
-			canvas.height = height;
-			window.addEventListener("resize", function() {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-			}, true);
-		}
-		var context = canvas.getContext("2d");
-		while (particles.length < maxParticleCount)
-			particles.push(resetParticle({}, width, height));
-		streamingConfetti = true;
-		if (animationTimer === null) {
-			(function runAnimation() {
-				context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-				if (particles.length === 0)
-					animationTimer = null;
-				else {
-					updateParticles();
-					drawParticles(context);
-					animationTimer = requestAnimFrame(runAnimation);
-				}
-			})();
-		}
-	}
+function resetParticle(particle, width, height) {
+  particle.color = colors[Math.floor(Math.random() * colors.length)];
+  particle.x = Math.random() * width;
+  particle.y = Math.random() * height - height;
+  particle.diameter = Math.random() * 10 + 5;
+  particle.tilt = Math.random() * 10 - 10;
+  particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
+  particle.tiltAngle = 0;
+  return particle;
+}
 
-	function stopConfettiInner() {
-		streamingConfetti = false;
-	}
+const Confetti = () => {
+  const canvasRef = useRef(null);
+  const particles = useRef([]);
+  const animationTimer = useRef(null);
+  const waveAngle = useRef(0);
+  const streamingConfetti = useRef(false);
 
-	function removeConfettiInner() {
-		stopConfetti();
-		particles = [];
-	}
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
 
-	function toggleConfettiInner() {
-		if (streamingConfetti)
-			stopConfettiInner();
-		else
-			startConfettiInner();
-	}
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
 
-	function drawParticles(context) {
-		var particle;
-		var x;
-		for (var i = 0; i < particles.length; i++) {
-			particle = particles[i];
-			context.beginPath();
-			context.lineWidth = particle.diameter;
-			context.strokeStyle = particle.color;
-			x = particle.x + particle.tilt;
-			context.moveTo(x + particle.diameter / 2, particle.y);
-			context.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
-			context.stroke();
-		}
-	}
+    resize();
 
-	function updateParticles() {
-		var width = window.innerWidth;
-		var height = window.innerHeight;
-		var particle;
-		waveAngle += 0.01;
-		for (var i = 0; i < particles.length; i++) {
-			particle = particles[i];
-			if (!streamingConfetti && particle.y < -15)
-				particle.y = height + 100;
-			else {
-				particle.tiltAngle += particle.tiltAngleIncrement;
-				particle.x += Math.sin(waveAngle);
-				particle.y += (Math.cos(waveAngle) + particle.diameter + particleSpeed) * 0.5;
-				particle.tilt = Math.sin(particle.tiltAngle) * 15;
-			}
-			if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
-				if (streamingConfetti && particles.length <= maxParticleCount)
-					resetParticle(particle, width, height);
-				else {
-					particles.splice(i, 1);
-					i--;
-				}
-			}
-		}
-	}
-})();
+    window.addEventListener('resize', resize);
+
+    // Initialize particles
+    while (particles.current.length < maxParticleCount) {
+      particles.current.push(resetParticle({}, canvas.width, canvas.height));
+    }
+
+    streamingConfetti.current = true;
+
+    function drawParticles(ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.current.forEach(particle => {
+        ctx.beginPath();
+        ctx.lineWidth = particle.diameter;
+        ctx.strokeStyle = particle.color;
+        const x = particle.x + particle.tilt;
+        ctx.moveTo(x + particle.diameter / 2, particle.y);
+        ctx.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
+        ctx.stroke();
+      });
+    }
+
+    function updateParticles() {
+      waveAngle.current += 0.01;
+      const width = canvas.width;
+      const height = canvas.height;
+      for (let i = 0; i < particles.current.length; i++) {
+        const p = particles.current[i];
+        if (!streamingConfetti.current && p.y < -15) {
+          p.y = height + 100;
+        } else {
+          p.tiltAngle += p.tiltAngleIncrement;
+          p.x += Math.sin(waveAngle.current);
+          p.y += (Math.cos(waveAngle.current) + p.diameter + particleSpeed) * 0.5;
+          p.tilt = Math.sin(p.tiltAngle) * 15;
+        }
+        if (p.x > width + 20 || p.x < -20 || p.y > height) {
+          if (streamingConfetti.current && particles.current.length <= maxParticleCount) {
+            resetParticle(p, width, height);
+          } else {
+            particles.current.splice(i, 1);
+            i--;
+          }
+        }
+      }
+    }
+
+    function runAnimation() {
+      if (particles.current.length === 0) {
+        animationTimer.current = null;
+        return;
+      }
+      updateParticles();
+      drawParticles(context);
+      animationTimer.current = requestAnimationFrame(runAnimation);
+    }
+
+    runAnimation();
+
+    return () => {
+      streamingConfetti.current = false;
+      window.removeEventListener('resize', resize);
+      if (animationTimer.current) {
+        cancelAnimationFrame(animationTimer.current);
+      }
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 9999,
+      }}
+    />
+  );
+};
+
+export default Confetti;
