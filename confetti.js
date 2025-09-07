@@ -127,21 +127,4 @@ var removeConfetti; //call to stop the confetti animation and remove all confett
 			}
 		}
 	}
-// Added for touch support: toggle class on touch
-document.addEventListener('DOMContentLoaded', function() {
-  var card = document.querySelector('.card');
-  if (card) {
-    card.addEventListener('touchstart', function(e) {
-      e.preventDefault();
-      if (card.classList.contains('touch-hover')) {
-        card.classList.remove('touch-hover');
-      } else {
-        card.classList.add('touch-hover');
-      }
-    });
-  }
-});
-
 })();
-
-
